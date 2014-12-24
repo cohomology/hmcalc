@@ -6,7 +6,7 @@ import Data.Char (isLetter, isSpace, isAlphaNum, isDigit)
 import Control.Monad.State
 
 data TokenType = StartToken | EndToken | IdentifierToken String | NumberToken Rational | PlusToken | MinusToken | AsteriskToken | DivisionToken |
-                 LeftBracketToken | RightBracketToken | LeftCurlyToken | RightCurlyToken 
+                 LeftBracketToken | RightBracketToken | LeftCurlyToken | RightCurlyToken deriving (Show, Eq) 
 data Token = Token { tokenType     :: TokenType,
                      tokenPosition :: Int }
 data LexerError = InvalidState
@@ -20,37 +20,46 @@ initializeLexer string = state initialState where
  initialState state = (LexerResult ( Right ( Token { tokenType = StartToken, tokenPosition = 0 } ) ),  
    LexerPosition { lexerString=string, lexerPosition=0, lookAhead = [] } )  
 
-matchIdentifier :: String -> String
-matchIdentifier [] = []
-matchIdentifier s | isAlphaNum $ head s = head s : matchIdentifier (tail s) 
-                  | otherwise           = []
+matchIdentifier :: String -> Maybe (TokenType, Int)
+matchIdentifier [] = Nothing 
+matchIdentifier s | isLetter $ head s = let token = takeWhile isAlphaNum s 
+                                        in Just $ (IdentifierToken token, length token)
+                  | otherwise         = Nothing 
+                  
+matchSingleChars :: String -> Maybe (TokenType, Int)
+matchSingleChars s = let ret s = return (s, 1) 
+                     in case head s of 
+                     '+' -> ret PlusToken
+                     '-' -> ret MinusToken
+                     '*' -> ret AsteriskToken
+                     '/' -> ret DivisionToken
+                     '(' -> ret LeftBracketToken
+                     ')' -> ret RightBracketToken
+                     '{' -> ret LeftCurlyToken
+                     '}' -> ret RightCurlyToken
+                     _   -> Nothing
 
-charToTokenType :: Char -> Maybe TokenType
-charToTokenType c = case c of 
-  '+' -> Just PlusToken
-  '-' -> Just MinusToken
-  '*' -> Just AsteriskToken
-  '/' -> Just DivisionToken
-  '(' -> Just LeftBracketToken
-  ')' -> Just RightBracketToken
-  '{' -> Just LeftCurlyToken
-  '}' -> Just RightCurlyToken
-  _   -> Nothing 
-                         
-matchNumber :: String -> (String, Rational)
-matchNumber s = let matchNumberDo :: String -> Bool -> (String, String)
-                    matchNumberDo [] _  = ([],[])
-                    matchNumberDo s True  | isDigit $ head s = let (beforeDot, afterDot) = matchNumberDo (tail s) True 
-                                                               in (head s : beforeDot, afterDot)
-                                          | head s == '.'    = matchNumberDo (tail s) False
-                                          | otherwise        = ([], [])  
-                    matchNumberDo s False | isDigit $ head s = let (beforeDot, afterDot) = matchNumberDo (tail s) False 
-                                                               in (beforeDot, head s : afterDot)
-                                          | otherwise        = ([], [])  
-                    (bdot, adot) = matchNumberDo s True  
-                    bdotInt      = read ( bdot ++ adot ) :: Integer
-                    complete     = bdot ++ if length adot == 0 then [] else ['.'] ++ adot  
-                in (complete, bdotInt % ( 10 ^ (length adot) ) ) 
+checkNumberStart :: String -> Bool
+checkNumberStart [] = False
+checkNumberStart s | length s == 1  = isDigit $ head s
+                   | otherwise      = (isDigit $ head s) && (not ( ( head s == '0') && (isDigit $ head $ tail s ))) 
+
+matchNumber :: String -> Maybe (TokenType, Int)
+matchNumber []  = Nothing
+matchNumber s | checkNumberStart s =  let matchNumberDo :: String -> Bool -> (String, String)
+                                          matchNumberDo [] _  = ([],[])
+                                          matchNumberDo s True  | isDigit $ head s = let (beforeDot, afterDot) = matchNumberDo (tail s) True 
+                                                                                     in (head s : beforeDot, afterDot)
+                                                                | head s == '.'    = matchNumberDo (tail s) False
+                                                                | otherwise        = ([], [])  
+                                          matchNumberDo s False | isDigit $ head s = let (beforeDot, afterDot) = matchNumberDo (tail s) False 
+                                                                                     in (beforeDot, head s : afterDot)
+                                                                | otherwise        = ([], [])  
+                                          (bdot, adot) = matchNumberDo s True  
+                                          bdotInt      = read ( bdot ++ adot ) :: Integer
+                                          completeLn   = ( length bdot ) + if length adot == 0 then 0 else 1 + length adot  
+                                      in Just ( NumberToken $ bdotInt % ( 10 ^ (length adot) ), completeLn)  
+              | otherwise         = Nothing
 
 {- 
 lookAhead :: Word -> LexerState
