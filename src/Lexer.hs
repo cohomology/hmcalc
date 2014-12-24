@@ -1,6 +1,7 @@
 module Lexer where
 
 import Data.Ratio
+import Data.Word
 import Data.Char (isLetter, isSpace, isAlphaNum, isDigit)
 import Control.Monad.State
 
@@ -20,6 +21,7 @@ initializeLexer string = state initialState where
    LexerPosition { lexerString=string, lexerPosition=0, lookAhead = [] } )  
 
 matchIdentifier :: String -> String
+matchIdentifier [] = []
 matchIdentifier s | isAlphaNum $ head s = head s : matchIdentifier (tail s) 
                   | otherwise           = []
 
@@ -37,6 +39,7 @@ charToTokenType c = case c of
                          
 matchNumber :: String -> (String, Rational)
 matchNumber s = let matchNumberDo :: String -> Bool -> (String, String)
+                    matchNumberDo [] _  = ([],[])
                     matchNumberDo s True  | isDigit $ head s = let (beforeDot, afterDot) = matchNumberDo (tail s) True 
                                                                in (head s : beforeDot, afterDot)
                                           | head s == '.'    = matchNumberDo (tail s) False
@@ -50,7 +53,7 @@ matchNumber s = let matchNumberDo :: String -> Bool -> (String, String)
                 in (complete, bdotInt % ( 10 ^ (length adot) ) ) 
 
 {- 
-lookAhead :: Integer -> LexerState
+lookAhead :: Word -> LexerState
 lookAhead la = state lookAheadState where
   lookAheadState :: LexerPosition -> (LexerResult, LexerPosition)
   lookAheadState lpos@(LexerPosition { lexerString=cstr, lexerPosition=cpos, lookAhead=cla } )
