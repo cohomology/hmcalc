@@ -46,16 +46,14 @@ checkNumberStart s | length s == 1  = isDigit $ head s
 
 matchNumber :: String -> Maybe (TokenType, Int)
 matchNumber []  = Nothing
-matchNumber s | checkNumberStart s =  let matchNumberDo :: String -> Bool -> (String, String)
-                                          matchNumberDo [] _  = ([],[])
-                                          matchNumberDo s True  | isDigit $ head s = let (beforeDot, afterDot) = matchNumberDo (tail s) True 
-                                                                                     in (head s : beforeDot, afterDot)
-                                                                | head s == '.'    = matchNumberDo (tail s) False
-                                                                | otherwise        = ([], [])  
-                                          matchNumberDo s False | isDigit $ head s = let (beforeDot, afterDot) = matchNumberDo (tail s) False 
-                                                                                     in (beforeDot, head s : afterDot)
-                                                                | otherwise        = ([], [])  
-                                          (bdot, adot) = matchNumberDo s True  
+matchNumber s | checkNumberStart s =  let matchNumberDo :: String -> (String, String)
+                                          matchNumberDo [] = ([],[])
+                                          matchNumberDo s  = let beforeDot    = takeWhile isDigit s
+                                                                 rest         = drop (length beforeDot) s
+                                                                 afterDot     = if length rest > 1 && head rest == '.' 
+                                                                                then takeWhile isDigit (tail rest) else []  
+                                                             in (beforeDot, afterDot)
+                                          (bdot, adot) = matchNumberDo s 
                                           bdotInt      = read ( bdot ++ adot ) :: Integer
                                           completeLn   = ( length bdot ) + if length adot == 0 then 0 else 1 + length adot  
                                       in Just ( NumberToken $ bdotInt % ( 10 ^ (length adot) ), completeLn)  
