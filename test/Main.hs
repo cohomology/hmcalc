@@ -1,4 +1,4 @@
-module TestLexer where
+module Main where
 
 import Lexer
 import Test.HUnit (Test(..), assertEqual, runTestTT)
