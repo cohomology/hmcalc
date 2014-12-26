@@ -134,6 +134,8 @@ testMatchIdentifier24 = TestCase (assertEqual "0" (Nothing) (matchIdentifier "0"
 testMatchIdentifier25 = TestCase (assertEqual "1" (Nothing) (matchIdentifier "1" 0))
 testMatchIdentifier26 = TestCase (assertEqual "2" (Nothing) (matchIdentifier "2" 0))
 testMatchIdentifier27 = TestCase (assertEqual "9" (Nothing) (matchIdentifier "9" 0))
+testMatchIdentifier28 = TestCase (assertEqual "HUgO22" (Just Token { tokenType=IdentifierToken, tokenString="HUgO22", tokenPosition=0 }) (matchIdentifier "HUgO22" 0))
+testMatchIdentifier29 = TestCase (assertEqual "Ü"  (Just Token { tokenType=IdentifierToken, tokenString="\220", tokenPosition=0 }) (matchIdentifier "Ü" 0))
 
 tests = TestList [
                     TestLabel "matchIdentifier Test1"   testMatchIdentifier1,
@@ -162,5 +164,7 @@ tests = TestList [
                     TestLabel "matchIdentifier Test24"  testMatchIdentifier24,
                     TestLabel "matchIdentifier Test25"  testMatchIdentifier25,
                     TestLabel "matchIdentifier Test26"  testMatchIdentifier26,
-                    TestLabel "matchIdentifier Test27"  testMatchIdentifier27
+                    TestLabel "matchIdentifier Test27"  testMatchIdentifier27,
+                    TestLabel "matchIdentifier Test28"  testMatchIdentifier28,
+                    TestLabel "matchIdentifier Test29"  testMatchIdentifier29
                  ]
