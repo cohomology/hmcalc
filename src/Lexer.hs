@@ -7,10 +7,14 @@ import Control.Monad.State
 import Data.Boolean ((&&), (||), not)
 
 -- | The 'TokenType' describes the different kinds of tokens
-data TokenType =  StartToken        -- ^ Artificial token, corresponding to a lexer state where no token has been lexed 
-                | EndToken          -- ^ Artificial token, indicating that the lexer has reached the input string 
-                | IdentifierToken   -- ^ Identifier, i.e. string starting with a letter and containing arbitrary alphanumeric chararacters afterwards 
-                | NumberToken       -- ^ Rational number, i.e. '12' or '12.34' without sign. Things like '.5' or '12.' are not allowed 
+data TokenType =  StartToken        -- ^ Artificial token, corresponding to a lexer state 
+                                    --   where no token has been lexed 
+                | EndToken          -- ^ Artificial token, indicating that the lexer has 
+                                    --   reached the input string 
+                | IdentifierToken   -- ^ Identifier, i.e. string starting with a letter and 
+                                    --   containing arbitrary alphanumeric chararacters afterwards 
+                | NumberToken       -- ^ Rational number, i.e. '12' or '12.34' without sign. Tokens 
+                                    --   like '.5' or '12.' are not allowed 
                 | PlusToken         -- ^ '+' token 
                 | MinusToken        -- ^ '-' token 
                 | AsteriskToken     -- ^ '*' token 
@@ -23,7 +27,8 @@ data TokenType =  StartToken        -- ^ Artificial token, corresponding to a le
                 | CommaToken        -- ',' token
                 deriving (Show, Eq) 
 
--- | A 'Token' containes all information about a token, i.e. its literal value, the position in the input string and its TokenType
+-- | A 'Token' containes all information about a token, i.e. its literal value, the position in the input string 
+--   and its TokenType
 data Token = Token { tokenType       :: TokenType -- ^ type of the token
                      , tokenLength   :: Int       -- ^ length of the token 
                      , tokenPosition :: Int       -- ^ position in the input string
@@ -50,9 +55,10 @@ initializeLexer string = state initialState where
  initialState state = (LexerResult ( Right ( Token { tokenType=StartToken, tokenLength = 0, tokenPosition = 0 } ) ),  
    LexerPosition { lexerString=string, lexerPosition=0 } )  
 
--- | Helper function for the different 'match' routines. It removes as many characters from the string constituting the first parameter
---   as the second parameter suggests and invokes the given function (i.e. the third parameter) on the resulting string. It returns 'Nothing' if the given function
---   returns 'Nothing' and else in constructs a token from the overall information provided.
+-- | Helper function for the different 'match' routines. It removes as many characters from the string constituting 
+--   the first parameter as the second parameter suggests and invokes the given function (i.e. the third parameter) 
+--   on the resulting string. It returns 'Nothing' if the given function returns 'Nothing' and else in constructs a 
+--   ktoken from the overall information provided.
 positionMatchHelper :: TokenType 
                        -> String                      -- ^ input string 
                        -> Int                         -- ^ position in string
@@ -60,13 +66,18 @@ positionMatchHelper :: TokenType
                        -> Maybe Token                 -- ^ final token
 positionMatchHelper ttype s pos f | length s <= pos = Nothing
                                   | otherwise       = let tlength = f $ drop pos s 
-                                                      in maybe Nothing ( \len -> Just $ Token { tokenType=ttype, tokenLength=len, tokenPosition=pos } ) tlength 
+                                                          lfun len = Just $ Token { tokenType=ttype, tokenLength=len, 
+                                                                                    tokenPosition=pos } 
+                                                      in maybe Nothing lfun tlength 
 
 -- | The 'matchIdentifier' function matches a single identifier.
 matchIdentifier :: String              -- ^ input string 
                    -> Int              -- ^ position in input string 
                    -> Maybe Token      -- ^ Nothing if no identifier matched, else the generated token 
-matchIdentifier s pos = positionMatchHelper IdentifierToken s pos ( \string -> if isLetter $ head string then return $ length $ takeWhile isAlphaNum string else Nothing ) 
+matchIdentifier s pos = positionMatchHelper IdentifierToken s pos 
+                          ( \string -> if isLetter $ head string then return $ length $ takeWhile isAlphaNum string 
+                                       else Nothing 
+                          ) 
 
 -- | The 'matchSingleChars' function matches all operators and brackets 
 matchSingleChars :: String      -- ^ input string 
@@ -98,28 +109,40 @@ checkNumberStart s | length s == 1 = isDigit $ head s
 matchNumber :: String         -- ^ input string 
                -> Int         -- ^ position in input string 
                -> Maybe Token -- ^ 'Nothing' if no number has been found at the given position, else the token 
-matchNumber s pos = positionMatchHelper NumberToken s pos (\string -> if not $ checkNumberStart string then Nothing 
-                                                                      else let isPoint c = c == '.' 
-                                                                               lst = takeWhile ( isDigit || isPoint ) string 
-                                                                           in if (( length $ filter isPoint lst ) <= 1) && ( not $ isPoint $ last lst ) then return $ length lst 
-                                                                              else Nothing
-                                                          ) 
+matchNumber s pos = positionMatchHelper NumberToken s pos 
+                      (\string -> if not $ checkNumberStart string then Nothing 
+                                  else let isPoint c = c == '.' 
+                                           lst = takeWhile ( isDigit || isPoint ) string 
+                                       in if (( length $ filter isPoint lst ) <= 1) && ( not $ isPoint $ last lst ) 
+                                          then return $ length lst 
+                                          else Nothing
+                      ) 
 
 -- Unit Test section --
 
-testMatchIdentifier1  = TestCase (assertEqual "hugo" (Just Token { tokenType=IdentifierToken, tokenLength=4, tokenPosition=0 }) (matchIdentifier "hugo" 0))
-testMatchIdentifier2  = TestCase (assertEqual "ugo" (Just Token { tokenType=IdentifierToken, tokenLength=3, tokenPosition=1 }) (matchIdentifier "hugo" 1))
-testMatchIdentifier3  = TestCase (assertEqual "go" (Just Token { tokenType=IdentifierToken, tokenLength=2, tokenPosition=2 }) (matchIdentifier "hugo" 2))
-testMatchIdentifier4  = TestCase (assertEqual "o" (Just Token { tokenType=IdentifierToken, tokenLength=1, tokenPosition=3 }) (matchIdentifier "hugo" 3))
+testMatchIdentifier1  = TestCase (assertEqual "hugo" (Just Token { tokenType=IdentifierToken, tokenLength=4, 
+                                                                   tokenPosition=0 }) (matchIdentifier "hugo" 0))
+testMatchIdentifier2  = TestCase (assertEqual "ugo" (Just Token { tokenType=IdentifierToken, 
+                                                                  tokenLength=3, tokenPosition=1 }) 
+                                                                        (matchIdentifier "hugo" 1))
+testMatchIdentifier3  = TestCase (assertEqual "go" (Just Token { tokenType=IdentifierToken, 
+                                                                 tokenLength=2, tokenPosition=2 }) 
+                                                                        (matchIdentifier "hugo" 2))
+testMatchIdentifier4  = TestCase (assertEqual "o" (Just Token { tokenType=IdentifierToken, 
+                                                                tokenLength=1, tokenPosition=3 }) (matchIdentifier "hugo" 3))
 testMatchIdentifier5  = TestCase (assertEqual "<Nothing>" (Nothing) (matchIdentifier "hugo" 4))
-testMatchIdentifier6  = TestCase (assertEqual "hello" (Just Token { tokenType=IdentifierToken, tokenLength=5, tokenPosition=0 }) (matchIdentifier "hello welt" 0))
+testMatchIdentifier6  = TestCase (assertEqual "hello" (Just Token { tokenType=IdentifierToken, 
+                                                                    tokenLength=5, tokenPosition=0 }) 
+                                                        (matchIdentifier "hello welt" 0))
 testMatchIdentifier7  = TestCase (assertEqual "hello" (Nothing) (matchIdentifier "hello welt" 22))
 testMatchIdentifier8  = TestCase (assertEqual "hello" (Nothing) (matchIdentifier "" 0))
 testMatchIdentifier9  = TestCase (assertEqual "hello" (Nothing) (matchIdentifier "" 1))
 testMatchIdentifier10 = TestCase (assertEqual "1hugo" (Nothing) (matchIdentifier "1hugo" 0))
-testMatchIdentifier11 = TestCase (assertEqual "hugo" (Just Token { tokenType=IdentifierToken, tokenLength=4, tokenPosition=1 }) (matchIdentifier "1hugo" 1))
+testMatchIdentifier11 = TestCase (assertEqual "hugo" (Just Token { tokenType=IdentifierToken, 
+                                                                   tokenLength=4, tokenPosition=1 }) (matchIdentifier "1hugo" 1))
 testMatchIdentifier12 = TestCase (assertEqual "+hugo" (Nothing) (matchIdentifier "+hugo" 0))
-testMatchIdentifier13 = TestCase (assertEqual "hugo" (Just Token { tokenType=IdentifierToken, tokenLength=4, tokenPosition=1 }) (matchIdentifier "+hugo" 1))
+testMatchIdentifier13 = TestCase (assertEqual "hugo" (Just Token { tokenType=IdentifierToken, 
+                                                                   tokenLength=4, tokenPosition=1 }) (matchIdentifier "+hugo" 1))
 testMatchIdentifier14 = TestCase (assertEqual "+" (Nothing) (matchIdentifier "+" 0))
 testMatchIdentifier15 = TestCase (assertEqual "-" (Nothing) (matchIdentifier "-" 0))
 testMatchIdentifier16 = TestCase (assertEqual "*" (Nothing) (matchIdentifier "*" 0))
@@ -134,8 +157,10 @@ testMatchIdentifier24 = TestCase (assertEqual "0" (Nothing) (matchIdentifier "0"
 testMatchIdentifier25 = TestCase (assertEqual "1" (Nothing) (matchIdentifier "1" 0))
 testMatchIdentifier26 = TestCase (assertEqual "2" (Nothing) (matchIdentifier "2" 0))
 testMatchIdentifier27 = TestCase (assertEqual "9" (Nothing) (matchIdentifier "9" 0))
-testMatchIdentifier28 = TestCase (assertEqual "HUgO22" (Just Token { tokenType=IdentifierToken, tokenLength=6, tokenPosition=0 }) (matchIdentifier "HUgO22" 0))
-testMatchIdentifier29 = TestCase (assertEqual "Ü"  (Just Token { tokenType=IdentifierToken, tokenLength=1, tokenPosition=0 }) (matchIdentifier "Ü" 0))
+testMatchIdentifier28 = TestCase (assertEqual "HUgO22" (Just Token { tokenType=IdentifierToken, tokenLength=6, 
+                                                                     tokenPosition=0 }) (matchIdentifier "HUgO22" 0))
+testMatchIdentifier29 = TestCase (assertEqual "Ü"  (Just Token { tokenType=IdentifierToken, tokenLength=1, 
+                                                                 tokenPosition=0 }) (matchIdentifier "Ü" 0))
 
 tests = TestList [
                     TestLabel "matchIdentifier Test1"   testMatchIdentifier1,
