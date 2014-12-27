@@ -10,10 +10,9 @@ module Hmcalc.Lexer(
     initializeLexer
   ) where
 
-import Prelude hiding ((&&), (||), not) 
+import Prelude 
 import Data.Char (isLetter, isAlphaNum, isDigit)
 import Control.Monad.State
-import Data.Boolean ((&&), (||), not)
 
 -- | The 'TokenType' describes the different kinds of tokens
 data TokenType =  StartToken        -- ^ Artificial token, corresponding to a lexer state 
@@ -114,20 +113,20 @@ checkNumberStart :: String  -- ^ input string
 checkNumberStart s | length s == 1 = isDigit $ head s
                    | otherwise     = isDigit (head s) && not (( head s == '0') && isDigit (head $ tail s)) 
 
--- | Counts the number of digits before the second instance of '.'. Assumes that the string does not start with '.'
---   and consists of digits and points only. It also doesn't count the last instance of '.', if the final string 
---   would end with '.'.
-countBeforeSecondInstanceOf :: String  -- ^ Input string
-                               -> Int  -- ^ Number of characters before second '.'.
-countBeforeSecondInstanceOf s = let cutDo :: String -> Bool -> String
-                                    cutDo []     _     = [] 
-                                    cutDo string True  = let h = head string 
-                                                         in if h /= '.' then h : cutDo (tail string) True else [] 
-                                    cutDo string False = let h = head string 
-                                                         in if h /= '.' then h : cutDo (tail string) False
-                                                            else h : cutDo (tail string) True 
-                                    cuttedStr = cutDo s False
-                                in if last cuttedStr == '.' then -1 + length cuttedStr else length cuttedStr
+-- | Variant of 'takeWhile' which takes as many elements from a list as boolfunc1 || boolfunc2 is true.
+--   But: the second boolean function may only be true 1 time, and also not at the end of the list
+takeWhileNoSecond :: ( a -> Bool )        -- ^ First boolean function, may be true any number of times
+                     -> ( a -> Bool )     -- ^ Second boolean function, may only be true once 
+                     -> [a]               -- ^ Input list 
+                     -> [a]               -- ^ Output list
+takeWhileNoSecond _  _  []  = []
+takeWhileNoSecond f1 f2 lst | f2 (head lst)  = [] 
+                            | otherwise      = let before = takeWhile f1 lst
+                                                   rest   = drop (length before) lst
+                                                   after  = if (length rest > 1) && f2 (head rest) 
+                                                            then (head rest) : takeWhile f1 (tail rest)
+                                                            else []
+                                               in if null after || f2 (last after) then before else before ++ after 
 
 -- | The 'matchNumber' function matches a single number, e.g. '12.43'
 matchNumber :: String         -- ^ input string 
@@ -135,8 +134,7 @@ matchNumber :: String         -- ^ input string
                -> Maybe Token -- ^ 'Nothing' if no number has been found at the given position, else the token 
 matchNumber s pos = positionMatchHelper NumberToken s pos 
                       (\string -> if not $ checkNumberStart string then Nothing 
-                                  else let isPoint c = c == '.' 
-                                           lst = takeWhile ( isDigit || isPoint ) string 
-                                       in return $ countBeforeSecondInstanceOf lst                      ) 
+                                  else return $ length $ takeWhileNoSecond isDigit (== '.') string
+                      ) 
 
 
