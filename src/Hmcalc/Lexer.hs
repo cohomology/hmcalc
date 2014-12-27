@@ -1,4 +1,4 @@
-module Lexer(
+module Hmcalc.Lexer(
     TokenType(..), 
     Token(..), 
     LexerError(..),
@@ -6,12 +6,12 @@ module Lexer(
     LexerState,
     matchIdentifier,
     matchNumber,
-    matchSingleChars
+    matchSingleChars,
+    initializeLexer
   ) where
 
 import Prelude hiding ((&&), (||), not) 
-import Data.Char (isLetter, isSpace, isAlphaNum, isDigit)
-import Test.HUnit (Test(..), assertEqual, runTestTT) 
+import Data.Char (isLetter, isAlphaNum, isDigit)
 import Control.Monad.State
 import Data.Boolean ((&&), (||), not)
 
@@ -61,7 +61,7 @@ type LexerState = State LexerInternalState LexerResult
 initializeLexer :: String -> LexerState
 initializeLexer string = state initialState where
  initialState :: LexerInternalState -> (LexerResult, LexerInternalState)
- initialState state = (LexerResult ( Right ( Token { tokenType=StartToken, tokenLength = 0, tokenPosition = 0 } ) ),  
+ initialState _ = (LexerResult ( Right Token { tokenType=StartToken, tokenLength = 0, tokenPosition = 0 } ),  
    LexerPosition { lexerString=string, lexerPosition=0 } )  
 
 -- | Helper function for the different 'match' routines. It removes as many characters from the string constituting 
@@ -75,8 +75,8 @@ positionMatchHelper :: TokenType
                        -> Maybe Token                 -- ^ final token
 positionMatchHelper ttype s pos f | length s <= pos = Nothing
                                   | otherwise       = let tlength = f $ drop pos s 
-                                                          lfun len = Just $ Token { tokenType=ttype, tokenLength=len, 
-                                                                                    tokenPosition=pos } 
+                                                          lfun len = Just Token { tokenType=ttype, tokenLength=len, 
+                                                                                  tokenPosition=pos } 
                                                       in maybe Nothing lfun tlength 
 
 -- | The 'matchIdentifier' function matches a single identifier.
@@ -94,7 +94,7 @@ matchSingleChars :: String      -- ^ input string
                  -> Maybe Token -- ^ 'Nothing', if no operator or bracket has been matched, else the generated token 
 matchSingleChars s pos | length s <= pos = Nothing
                        | otherwise       = let start = head $ drop pos s  
-                                               ret s = return Token { tokenType=s, tokenLength=1, tokenPosition=pos }  
+                                               ret t = return Token { tokenType=t, tokenLength=1, tokenPosition=pos }  
                                            in case start of 
                                              '+' -> ret PlusToken
                                              '-' -> ret MinusToken
@@ -112,7 +112,7 @@ matchSingleChars s pos | length s <= pos = Nothing
 checkNumberStart :: String  -- ^ input string 
                     -> Bool -- ^ is start of valid number
 checkNumberStart s | length s == 1 = isDigit $ head s
-                   | otherwise     = (isDigit $ head s) && (not ( ( head s == '0') && (isDigit $ head $ tail s ))) 
+                   | otherwise     = isDigit (head s) && not (( head s == '0') && isDigit (head $ tail s)) 
 
 -- | Counts the number of digits before the second instance of '.'. Assumes that the string does not start with '.'
 --   and consists of digits and points only. It also doesn't count the last instance of '.', if the final string 
@@ -122,10 +122,10 @@ countBeforeSecondInstanceOf :: String  -- ^ Input string
 countBeforeSecondInstanceOf s = let cutDo :: String -> Bool -> String
                                     cutDo []     _     = [] 
                                     cutDo string True  = let h = head string 
-                                                         in if h /= '.' then [h] ++ cutDo (tail string) True else [] 
+                                                         in if h /= '.' then h : cutDo (tail string) True else [] 
                                     cutDo string False = let h = head string 
-                                                         in if h /= '.' then [h] ++ cutDo (tail string) False
-                                                            else [h] ++ cutDo (tail string) True 
+                                                         in if h /= '.' then h : cutDo (tail string) False
+                                                            else h : cutDo (tail string) True 
                                     cuttedStr = cutDo s False
                                 in if last cuttedStr == '.' then -1 + length cuttedStr else length cuttedStr
 

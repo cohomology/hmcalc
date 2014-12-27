@@ -1,11 +1,9 @@
 module Main where
 
-import Lexer
-import Test.HUnit (Test(..), assertEqual, runTestTT)
+import Hmcalc.Lexer
 import Test.Framework
 import Test.Framework.Providers.HUnit
-import Data.Monoid
-import Control.Monad
+import Test.HUnit 
 
 testMatchIdentifier1  = TestCase (assertEqual "hugo" (Just Token { tokenType=IdentifierToken, tokenLength=4, 
                                                                    tokenPosition=0 }) 
@@ -56,7 +54,7 @@ testMatchIdentifier29 = TestCase (assertEqual "Ü"  (Just Token { tokenType=Iden
                                                                  tokenPosition=0 }) 
                                    (matchIdentifier "Ü" 0))
 
-tests = TestList [
+tests = hUnitTestToTests $ TestList [
                     TestLabel "matchIdentifier Test1"   testMatchIdentifier1,
                     TestLabel "matchIdentifier Test2"   testMatchIdentifier2,
                     TestLabel "matchIdentifier Test3"   testMatchIdentifier3,
@@ -88,4 +86,4 @@ tests = TestList [
                     TestLabel "matchIdentifier Test29"  testMatchIdentifier29
                  ]
 
-main = runTestTT tests 
+main = defaultMain tests 
