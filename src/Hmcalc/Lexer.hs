@@ -7,6 +7,7 @@ module Hmcalc.Lexer(
     matchIdentifier,
     matchNumber,
     matchSingleChars,
+    matchEndToken,
     initializeLexer
   ) where
 
@@ -142,5 +143,10 @@ matchNumber s pos = positionMatchHelper NumberToken s pos
                                           then return len 
                                           else Nothing
                       ) 
-
+-- | The 'matchEndToken' function matches the end of the input stream
+matchEndToken :: String     -- ^ input string 
+                 -> Int     -- ^ position in input string
+                 -> Maybe Token -- ^ Nothing of the position is a valid position in the input string, else the EndToken
+matchEndToken s pos | pos >= length s = return Token { tokenType=EndToken, tokenLength=0, tokenPosition=pos } 
+                    | otherwise       = Nothing
 

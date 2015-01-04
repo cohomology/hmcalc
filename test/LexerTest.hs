@@ -161,6 +161,19 @@ testMatchNumber14 = TestCase (assertEqual "12.43."
    (Just Token { tokenType=NumberToken, tokenLength=5, 
                 tokenPosition=0 })   (matchNumber "12.43." 0))
 
+testMatchEndToken1 = TestCase (assertEqual "." (Nothing) (matchEndToken "." 0))
+testMatchEndToken2 = TestCase (assertEqual "." (Nothing) (matchEndToken "1" 0))
+testMatchEndToken3 = TestCase (assertEqual "." (Nothing) (matchEndToken "a" 0))
+testMatchEndToken4 = TestCase (assertEqual "12.3" 
+   (Just Token { tokenType=EndToken, tokenLength=0, 
+                tokenPosition=4 })   (matchEndToken "12.3" 4))
+testMatchEndToken5 = TestCase (assertEqual "12.3" 
+   (Just Token { tokenType=EndToken, tokenLength=0, 
+                tokenPosition=6 })   (matchEndToken "12.3" 6))
+testMatchEndToken6 = TestCase (assertEqual "" 
+   (Just Token { tokenType=EndToken, tokenLength=0, 
+                tokenPosition=0 })   (matchEndToken "" 0))
+
 tests = hUnitTestToTests $ TestList [
                     TestLabel "matchIdentifier Test1"    testMatchIdentifier1,
                     TestLabel "matchIdentifier Test2"    testMatchIdentifier2,
@@ -248,7 +261,13 @@ tests = hUnitTestToTests $ TestList [
                     TestLabel "testMatchNumber Test11"  testMatchNumber11,
                     TestLabel "testMatchNumber Test12"  testMatchNumber12,
                     TestLabel "testMatchNumber Test13"  testMatchNumber13,
-                    TestLabel "testMatchNumber Test14"  testMatchNumber14
+                    TestLabel "testMatchNumber Test14"  testMatchNumber14,
+                    TestLabel "testMatchEndToken Test01"  testMatchEndToken1,
+                    TestLabel "testMatchEndToken Test02"  testMatchEndToken2,
+                    TestLabel "testMatchEndToken Test03"  testMatchEndToken3,
+                    TestLabel "testMatchEndToken Test04"  testMatchEndToken4,
+                    TestLabel "testMatchEndToken Test05"  testMatchEndToken5,
+                    TestLabel "testMatchEndToken Test06"  testMatchEndToken6
                  ]
 
 main = defaultMain tests 
