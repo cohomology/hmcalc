@@ -150,3 +150,8 @@ matchEndToken :: String     -- ^ input string
 matchEndToken s pos | pos >= length s = return Token { tokenType=EndToken, tokenLength=0, tokenPosition=pos } 
                     | otherwise       = Nothing
 
+
+-- | The 'matchFunctions' function returns a list of all token matcher functions
+matchFunctions :: [(String -> Int -> Maybe Token)]
+matchFunctions = [matchIdentifier, matchSingleChars, matchNumber, matchEndToken]
+
