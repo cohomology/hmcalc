@@ -132,6 +132,35 @@ testMatchSingleChars42 = TestCase (assertEqual "a^b"
 testMatchSingleChars43 = TestCase (assertEqual "a^b" (Nothing) (matchSingleChars "a^b" 2))
 testMatchSingleChars44 = TestCase (assertEqual "a^b" (Nothing) (matchSingleChars "a^b" 5))
 
+testMatchNumber1 = TestCase (assertEqual "123" 
+   (Just Token { tokenType=NumberToken, tokenLength=3, 
+                tokenPosition=0 })   (matchNumber "123" 0))
+testMatchNumber2 = TestCase (assertEqual "a123" (Nothing) (matchNumber "a123" 0))
+testMatchNumber3 = TestCase (assertEqual "123a" (Nothing) (matchNumber "123a" 0))
+testMatchNumber4 = TestCase (assertEqual "12.43" 
+   (Just Token { tokenType=NumberToken, tokenLength=5, 
+                tokenPosition=0 })   (matchNumber "12.43" 0))
+testMatchNumber5 = TestCase (assertEqual "12.43" 
+   (Just Token { tokenType=NumberToken, tokenLength=4, 
+                tokenPosition=1 })   (matchNumber "12.43" 1))
+testMatchNumber6 = TestCase (assertEqual "12.43" (Nothing) (matchNumber "12.43" 2))
+testMatchNumber7 = TestCase (assertEqual ".2" (Nothing) (matchNumber ".2" 0))
+testMatchNumber8 = TestCase (assertEqual ".2" 
+   (Just Token { tokenType=NumberToken, tokenLength=1, 
+                tokenPosition=1 })   (matchNumber ".2" 1))
+testMatchNumber9 = TestCase (assertEqual ".2a" (Nothing) (matchNumber ".2a" 1))
+testMatchNumber10 = TestCase (assertEqual "00.2" 
+   (Just Token { tokenType=NumberToken, tokenLength=3, 
+                tokenPosition=1 })   (matchNumber "00.2" 1))
+testMatchNumber11 = TestCase (assertEqual "00.2" (Nothing) (matchNumber "00.2" 0))
+testMatchNumber12 = TestCase (assertEqual "0." 
+   (Just Token { tokenType=NumberToken, tokenLength=1, 
+                tokenPosition=0 })   (matchNumber "0." 0))
+testMatchNumber13 = TestCase (assertEqual "." (Nothing) (matchNumber "." 0))
+testMatchNumber14 = TestCase (assertEqual "12.43." 
+   (Just Token { tokenType=NumberToken, tokenLength=5, 
+                tokenPosition=0 })   (matchNumber "12.43." 0))
+
 tests = hUnitTestToTests $ TestList [
                     TestLabel "matchIdentifier Test1"    testMatchIdentifier1,
                     TestLabel "matchIdentifier Test2"    testMatchIdentifier2,
@@ -205,7 +234,21 @@ tests = hUnitTestToTests $ TestList [
                     TestLabel "matchSingleChars Test41"  testMatchSingleChars41,
                     TestLabel "matchSingleChars Test42"  testMatchSingleChars42,
                     TestLabel "matchSingleChars Test43"  testMatchSingleChars43,
-                    TestLabel "matchSingleChars Test44"  testMatchSingleChars44
+                    TestLabel "matchSingleChars Test44"  testMatchSingleChars44,
+                    TestLabel "testMatchNumber Test01"  testMatchNumber1,
+                    TestLabel "testMatchNumber Test02"  testMatchNumber2,
+                    TestLabel "testMatchNumber Test03"  testMatchNumber3,
+                    TestLabel "testMatchNumber Test04"  testMatchNumber4,
+                    TestLabel "testMatchNumber Test05"  testMatchNumber5,
+                    TestLabel "testMatchNumber Test06"  testMatchNumber6,
+                    TestLabel "testMatchNumber Test07"  testMatchNumber7,
+                    TestLabel "testMatchNumber Test08"  testMatchNumber8,
+                    TestLabel "testMatchNumber Test09"  testMatchNumber9,
+                    TestLabel "testMatchNumber Test10"  testMatchNumber10,
+                    TestLabel "testMatchNumber Test11"  testMatchNumber11,
+                    TestLabel "testMatchNumber Test12"  testMatchNumber12,
+                    TestLabel "testMatchNumber Test13"  testMatchNumber13,
+                    TestLabel "testMatchNumber Test14"  testMatchNumber14
                  ]
 
 main = defaultMain tests 

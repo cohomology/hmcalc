@@ -127,7 +127,7 @@ takeWhileNoSecond f1 f2 lst | f2 (head lst)  = []
                             | otherwise      = let before = takeWhile f1 lst
                                                    rest   = drop (length before) lst
                                                    after  = if (length rest > 1) && f2 (head rest) 
-                                                            then (head rest) : takeWhile f1 (tail rest)
+                                                            then head rest : takeWhile f1 (tail rest)
                                                             else []
                                                in if null after || f2 (last after) then before else before ++ after 
 
@@ -137,7 +137,10 @@ matchNumber :: String         -- ^ input string
                -> Maybe Token -- ^ 'Nothing' if no number has been found at the given position, else the token 
 matchNumber s pos = positionMatchHelper NumberToken s pos 
                       (\string -> if not $ checkNumberStart string then Nothing 
-                                  else return $ length $ takeWhileNoSecond isDigit (== '.') string
+                                  else let len = length $ takeWhileNoSecond isDigit (== '.') string
+                                       in if length string == len || not (isAlphaNum $ head $ drop len string)
+                                          then return len 
+                                          else Nothing
                       ) 
 
 
