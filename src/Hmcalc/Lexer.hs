@@ -33,6 +33,7 @@ data TokenType =  StartToken        -- ^ Artificial token, corresponding to a le
                 | RightCurlyToken   -- ^ '}' token 
                 | AssignmentToken   -- ^ '=' token 
                 | CommaToken        -- ^ ',' token
+                | PowerToken        -- ^ '^' token
                 deriving (Show, Eq) 
 
 -- | A 'Token' containes all information about a token, i.e. its literal value, the position in the input string 
@@ -104,6 +105,8 @@ matchSingleChars s pos | length s <= pos = Nothing
                                              '{' -> ret LeftCurlyToken
                                              '}' -> ret RightCurlyToken
                                              ',' -> ret CommaToken
+                                             '=' -> ret AssignmentToken
+                                             '^' -> ret PowerToken
                                              _   -> Nothing
 
 -- | The 'checkNumberStart' function checks, if a given combination of digits forms a number

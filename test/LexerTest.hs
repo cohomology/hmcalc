@@ -54,36 +54,158 @@ testMatchIdentifier29 = TestCase (assertEqual "Ü"  (Just Token { tokenType=Iden
                                                                  tokenPosition=0 }) 
                                    (matchIdentifier "Ü" 0))
 
+
+testMatchSingleChars1 = TestCase (assertEqual "a+b" (Nothing) (matchSingleChars "a+b" 0))
+testMatchSingleChars2 = TestCase (assertEqual "a+b" 
+  (Just Token { tokenType=PlusToken, tokenLength=1, 
+                tokenPosition=1 })   (matchSingleChars "a+b" 1))
+testMatchSingleChars3 = TestCase (assertEqual "a+b" (Nothing) (matchSingleChars "a+b" 2))
+testMatchSingleChars4 = TestCase (assertEqual "a+b" (Nothing) (matchSingleChars "a+b" 5))
+
+testMatchSingleChars5 = TestCase (assertEqual "a-b" (Nothing) (matchSingleChars "a-b" 0))
+testMatchSingleChars6 = TestCase (assertEqual "a-b" 
+  (Just Token { tokenType=MinusToken, tokenLength=1, 
+                tokenPosition=1 })   (matchSingleChars "a-b" 1))
+testMatchSingleChars7 = TestCase (assertEqual "a-b" (Nothing) (matchSingleChars "a-b" 2))
+testMatchSingleChars8 = TestCase (assertEqual "a-b" (Nothing) (matchSingleChars "a-b" 5))
+
+testMatchSingleChars9 = TestCase (assertEqual "a*b" (Nothing) (matchSingleChars "a*b" 0))
+testMatchSingleChars10 = TestCase (assertEqual "a*b" 
+  (Just Token { tokenType=AsteriskToken, tokenLength=1, 
+                tokenPosition=1 })   (matchSingleChars "a*b" 1))
+testMatchSingleChars11 = TestCase (assertEqual "a*b" (Nothing) (matchSingleChars "a*b" 2))
+testMatchSingleChars12 = TestCase (assertEqual "a*b" (Nothing) (matchSingleChars "a*b" 5))
+
+testMatchSingleChars13 = TestCase (assertEqual "a/b" (Nothing) (matchSingleChars "a/b" 0))
+testMatchSingleChars14 = TestCase (assertEqual "a/b" 
+  (Just Token { tokenType=DivisionToken, tokenLength=1, 
+                tokenPosition=1 })   (matchSingleChars "a/b" 1))
+testMatchSingleChars15 = TestCase (assertEqual "a/b" (Nothing) (matchSingleChars "a/b" 2))
+testMatchSingleChars16 = TestCase (assertEqual "a/b" (Nothing) (matchSingleChars "a/b" 5))
+
+testMatchSingleChars17 = TestCase (assertEqual "a(b" (Nothing) (matchSingleChars "a(b" 0))
+testMatchSingleChars18 = TestCase (assertEqual "a(b" 
+  (Just Token { tokenType=LeftBracketToken, tokenLength=1, 
+                tokenPosition=1 })   (matchSingleChars "a(b" 1))
+testMatchSingleChars19 = TestCase (assertEqual "a(b" (Nothing) (matchSingleChars "a(b" 2))
+testMatchSingleChars20 = TestCase (assertEqual "a(b" (Nothing) (matchSingleChars "a(b" 5))
+
+testMatchSingleChars21 = TestCase (assertEqual "a)b" (Nothing) (matchSingleChars "a)b" 0))
+testMatchSingleChars22 = TestCase (assertEqual "a)b" 
+  (Just Token { tokenType=RightBracketToken, tokenLength=1, 
+                tokenPosition=1 })   (matchSingleChars "a)b" 1))
+testMatchSingleChars23 = TestCase (assertEqual "a)b" (Nothing) (matchSingleChars "a)b" 2))
+testMatchSingleChars24 = TestCase (assertEqual "a)b" (Nothing) (matchSingleChars "a)b" 5))
+
+testMatchSingleChars25 = TestCase (assertEqual "a{b" (Nothing) (matchSingleChars "a{b" 0))
+testMatchSingleChars26 = TestCase (assertEqual "a{b" 
+  (Just Token { tokenType=LeftCurlyToken, tokenLength=1, 
+                tokenPosition=1 })   (matchSingleChars "a{b" 1))
+testMatchSingleChars27 = TestCase (assertEqual "a{b" (Nothing) (matchSingleChars "a{b" 2))
+testMatchSingleChars28 = TestCase (assertEqual "a{b" (Nothing) (matchSingleChars "a{b" 5))
+
+testMatchSingleChars29 = TestCase (assertEqual "a}b" (Nothing) (matchSingleChars "a}b" 0))
+testMatchSingleChars30 = TestCase (assertEqual "a}b" 
+  (Just Token { tokenType=RightCurlyToken, tokenLength=1, 
+                tokenPosition=1 })   (matchSingleChars "a}b" 1))
+testMatchSingleChars31 = TestCase (assertEqual "a}b" (Nothing) (matchSingleChars "a}b" 2))
+testMatchSingleChars32 = TestCase (assertEqual "a}b" (Nothing) (matchSingleChars "a}b" 5))
+
+testMatchSingleChars33 = TestCase (assertEqual "a=b" (Nothing) (matchSingleChars "a=b" 0))
+testMatchSingleChars34 = TestCase (assertEqual "a=b" 
+  (Just Token { tokenType=AssignmentToken, tokenLength=1, 
+                tokenPosition=1 })   (matchSingleChars "a=b" 1))
+testMatchSingleChars35 = TestCase (assertEqual "a=b" (Nothing) (matchSingleChars "a=b" 2))
+testMatchSingleChars36 = TestCase (assertEqual "a=b" (Nothing) (matchSingleChars "a=b" 5))
+
+testMatchSingleChars37 = TestCase (assertEqual "a,b" (Nothing) (matchSingleChars "a,b" 0))
+testMatchSingleChars38 = TestCase (assertEqual "a,b" 
+  (Just Token { tokenType=CommaToken, tokenLength=1, 
+                tokenPosition=1 })   (matchSingleChars "a,b" 1))
+testMatchSingleChars39 = TestCase (assertEqual "a,b" (Nothing) (matchSingleChars "a,b" 2))
+testMatchSingleChars40 = TestCase (assertEqual "a,b" (Nothing) (matchSingleChars "a,b" 5))
+
+testMatchSingleChars41 = TestCase (assertEqual "a^b" (Nothing) (matchSingleChars "a^b" 0))
+testMatchSingleChars42 = TestCase (assertEqual "a^b" 
+  (Just Token { tokenType=PowerToken, tokenLength=1, 
+                tokenPosition=1 })   (matchSingleChars "a^b" 1))
+testMatchSingleChars43 = TestCase (assertEqual "a^b" (Nothing) (matchSingleChars "a^b" 2))
+testMatchSingleChars44 = TestCase (assertEqual "a^b" (Nothing) (matchSingleChars "a^b" 5))
+
 tests = hUnitTestToTests $ TestList [
-                    TestLabel "matchIdentifier Test1"   testMatchIdentifier1,
-                    TestLabel "matchIdentifier Test2"   testMatchIdentifier2,
-                    TestLabel "matchIdentifier Test3"   testMatchIdentifier3,
-                    TestLabel "matchIdentifier Test4"   testMatchIdentifier4,
-                    TestLabel "matchIdentifier Test5"   testMatchIdentifier5,
-                    TestLabel "matchIdentifier Test6"   testMatchIdentifier6,
-                    TestLabel "matchIdentifier Test7"   testMatchIdentifier7,
-                    TestLabel "matchIdentifier Test8"   testMatchIdentifier8,
-                    TestLabel "matchIdentifier Test9"   testMatchIdentifier9,
-                    TestLabel "matchIdentifier Test10"  testMatchIdentifier10,
-                    TestLabel "matchIdentifier Test11"  testMatchIdentifier11,
-                    TestLabel "matchIdentifier Test12"  testMatchIdentifier12,
-                    TestLabel "matchIdentifier Test13"  testMatchIdentifier13,
-                    TestLabel "matchIdentifier Test14"  testMatchIdentifier14,
-                    TestLabel "matchIdentifier Test15"  testMatchIdentifier15,
-                    TestLabel "matchIdentifier Test16"  testMatchIdentifier16,
-                    TestLabel "matchIdentifier Test17"  testMatchIdentifier17,
-                    TestLabel "matchIdentifier Test18"  testMatchIdentifier18,
-                    TestLabel "matchIdentifier Test19"  testMatchIdentifier19,
-                    TestLabel "matchIdentifier Test20"  testMatchIdentifier20,
-                    TestLabel "matchIdentifier Test21"  testMatchIdentifier21,
-                    TestLabel "matchIdentifier Test22"  testMatchIdentifier22,
-                    TestLabel "matchIdentifier Test23"  testMatchIdentifier23,
-                    TestLabel "matchIdentifier Test24"  testMatchIdentifier24,
-                    TestLabel "matchIdentifier Test25"  testMatchIdentifier25,
-                    TestLabel "matchIdentifier Test26"  testMatchIdentifier26,
-                    TestLabel "matchIdentifier Test27"  testMatchIdentifier27,
-                    TestLabel "matchIdentifier Test28"  testMatchIdentifier28,
-                    TestLabel "matchIdentifier Test29"  testMatchIdentifier29
+                    TestLabel "matchIdentifier Test1"    testMatchIdentifier1,
+                    TestLabel "matchIdentifier Test2"    testMatchIdentifier2,
+                    TestLabel "matchIdentifier Test3"    testMatchIdentifier3,
+                    TestLabel "matchIdentifier Test4"    testMatchIdentifier4,
+                    TestLabel "matchIdentifier Test5"    testMatchIdentifier5,
+                    TestLabel "matchIdentifier Test6"    testMatchIdentifier6,
+                    TestLabel "matchIdentifier Test7"    testMatchIdentifier7,
+                    TestLabel "matchIdentifier Test8"    testMatchIdentifier8,
+                    TestLabel "matchIdentifier Test9"    testMatchIdentifier9,
+                    TestLabel "matchIdentifier Test10"   testMatchIdentifier10,
+                    TestLabel "matchIdentifier Test11"   testMatchIdentifier11,
+                    TestLabel "matchIdentifier Test12"   testMatchIdentifier12,
+                    TestLabel "matchIdentifier Test13"   testMatchIdentifier13,
+                    TestLabel "matchIdentifier Test14"   testMatchIdentifier14,
+                    TestLabel "matchIdentifier Test15"   testMatchIdentifier15,
+                    TestLabel "matchIdentifier Test16"   testMatchIdentifier16,
+                    TestLabel "matchIdentifier Test17"   testMatchIdentifier17,
+                    TestLabel "matchIdentifier Test18"   testMatchIdentifier18,
+                    TestLabel "matchIdentifier Test19"   testMatchIdentifier19,
+                    TestLabel "matchIdentifier Test20"   testMatchIdentifier20,
+                    TestLabel "matchIdentifier Test21"   testMatchIdentifier21,
+                    TestLabel "matchIdentifier Test22"   testMatchIdentifier22,
+                    TestLabel "matchIdentifier Test23"   testMatchIdentifier23,
+                    TestLabel "matchIdentifier Test24"   testMatchIdentifier24,
+                    TestLabel "matchIdentifier Test25"   testMatchIdentifier25,
+                    TestLabel "matchIdentifier Test26"   testMatchIdentifier26,
+                    TestLabel "matchIdentifier Test27"   testMatchIdentifier27,
+                    TestLabel "matchIdentifier Test28"   testMatchIdentifier28,
+                    TestLabel "matchIdentifier Test29"   testMatchIdentifier29,
+                    TestLabel "matchSingleChars Test1"   testMatchSingleChars1,
+                    TestLabel "matchSingleChars Test2"   testMatchSingleChars2,
+                    TestLabel "matchSingleChars Test3"   testMatchSingleChars3,
+                    TestLabel "matchSingleChars Test4"   testMatchSingleChars4,
+                    TestLabel "matchSingleChars Test5"   testMatchSingleChars5,
+                    TestLabel "matchSingleChars Test6"   testMatchSingleChars6,
+                    TestLabel "matchSingleChars Test7"   testMatchSingleChars7,
+                    TestLabel "matchSingleChars Test8"   testMatchSingleChars8,
+                    TestLabel "matchSingleChars Test9"   testMatchSingleChars9,
+                    TestLabel "matchSingleChars Test10"  testMatchSingleChars10,
+                    TestLabel "matchSingleChars Test11"  testMatchSingleChars11,
+                    TestLabel "matchSingleChars Test12"  testMatchSingleChars12,
+                    TestLabel "matchSingleChars Test13"  testMatchSingleChars13,
+                    TestLabel "matchSingleChars Test14"  testMatchSingleChars14,
+                    TestLabel "matchSingleChars Test15"  testMatchSingleChars15,
+                    TestLabel "matchSingleChars Test16"  testMatchSingleChars16,
+                    TestLabel "matchSingleChars Test17"  testMatchSingleChars17,
+                    TestLabel "matchSingleChars Test18"  testMatchSingleChars18,
+                    TestLabel "matchSingleChars Test19"  testMatchSingleChars19,
+                    TestLabel "matchSingleChars Test20"  testMatchSingleChars20,
+                    TestLabel "matchSingleChars Test21"  testMatchSingleChars21,
+                    TestLabel "matchSingleChars Test22"  testMatchSingleChars22,
+                    TestLabel "matchSingleChars Test23"  testMatchSingleChars23,
+                    TestLabel "matchSingleChars Test24"  testMatchSingleChars24,
+                    TestLabel "matchSingleChars Test25"  testMatchSingleChars25,
+                    TestLabel "matchSingleChars Test26"  testMatchSingleChars26,
+                    TestLabel "matchSingleChars Test27"  testMatchSingleChars27,
+                    TestLabel "matchSingleChars Test28"  testMatchSingleChars28,
+                    TestLabel "matchSingleChars Test29"  testMatchSingleChars29,
+                    TestLabel "matchSingleChars Test30"  testMatchSingleChars30,
+                    TestLabel "matchSingleChars Test31"  testMatchSingleChars31,
+                    TestLabel "matchSingleChars Test32"  testMatchSingleChars32,
+                    TestLabel "matchSingleChars Test33"  testMatchSingleChars33,
+                    TestLabel "matchSingleChars Test34"  testMatchSingleChars34,
+                    TestLabel "matchSingleChars Test35"  testMatchSingleChars35,
+                    TestLabel "matchSingleChars Test36"  testMatchSingleChars36,
+                    TestLabel "matchSingleChars Test37"  testMatchSingleChars37,
+                    TestLabel "matchSingleChars Test38"  testMatchSingleChars38,
+                    TestLabel "matchSingleChars Test39"  testMatchSingleChars39,
+                    TestLabel "matchSingleChars Test40"  testMatchSingleChars40,
+                    TestLabel "matchSingleChars Test41"  testMatchSingleChars41,
+                    TestLabel "matchSingleChars Test42"  testMatchSingleChars42,
+                    TestLabel "matchSingleChars Test43"  testMatchSingleChars43,
+                    TestLabel "matchSingleChars Test44"  testMatchSingleChars44
                  ]
 
 main = defaultMain tests 
