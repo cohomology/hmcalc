@@ -13,7 +13,7 @@ module Hmcalc.Lexer(
 
 import Data.Char (isLetter, isAlphaNum, isDigit, isSpace)
 import Control.Monad.State
-import Data.Maybe (fromJust, isJust)
+import Data.Maybe (fromJust, isJust, isNothing)
 import Data.List (find)
 
 -- | The 'TokenType' describes the different kinds of tokens
@@ -184,9 +184,9 @@ getNextToken (LexerResult (Right _ ))    = do oldState <- get
                                                   match = find isJust (map (($ (lexerString wsState, 
                                                                                 lexerPosition wsState)) . uncurry) 
                                                                        matchFunctions)   
-                                              if match == Nothing then do put oldState
-                                                                          return $ LexerResult (Left (InvalidToken 
-                                                                                                 (lexerPosition wsState))) 
+                                              if isNothing match then do put oldState
+                                                                         return $ LexerResult (Left (InvalidToken 
+                                                                                               (lexerPosition wsState))) 
                                               else let token = fromJust $ fromJust match 
                                                    in do put (increasePosition wsState (tokenLength token)) 
                                                          return $ LexerResult (Right token) 
