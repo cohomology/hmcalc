@@ -31,5 +31,5 @@ script:
 
 after_script:
   - ghc-pkg list
-  - cabal install hpc-coveralls
-  - hpc-coveralls --exclude-dir=test --display-report lexerTest
+  - cabal install codecov-haskell
+  - dist/build/codecov-haskell/codecov-haskell --exclude-dir=test --display-report lexerTest
