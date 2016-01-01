@@ -22,11 +22,11 @@ before_script:
   - ghc-pkg list
 
 script:
-  - cabal install --enable-tests --enable-benchmarks --enable-documentation --enable-coverage --only-dependencies
+  - cabal install --enable-tests --enable-benchmarks --enable-documentation --only-dependencies
   - cabal configure --enable-tests --enable-benchmarks --enable-coverage
   - cabal build
   - cabal test
-  - cabal install --enable-tests --enable-benchmarks --enable-documentation --enable-coverage 
+  - cabal install --enable-tests --enable-benchmarks --enable-documentation 
   - cabal sdist
 
 after_script:
