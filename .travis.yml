@@ -1,7 +1,52 @@
-language: haskell
-ghc: 7.10.2
+matrix:
+  include:
+   - env: CABALVER=1.20 GHCVER=7.8.4
+     addons:
+       apt:
+         sources:
+          - hvr-ghc
+         packages:
+          - cabal-install-1.20
+          - ghc-7.8.4
+   - env: CABALVER=1.22 GHCVER=7.10.3
+     addons:
+       apt:
+         sources:
+          - hvr-ghc
+         packages:
+          - cabal-install-1.22
+          - ghc-7.10.3
+   - env: CABALVER=head GHCVER=head
+     addons:
+       apt:
+         sources:
+          - hvr-ghc
+         packages:
+          - cabal-install-head
+          - ghc-head
+  allow_failures:
+   - env: CABALVER=head GHCVER=head
+
+sudo: false
+
+# The packages from the PPA don't put this into the PATH automatically.
+install:
+ - export PATH="/opt/cabal/$CABALVER/bin:/opt/ghc/$GHCVER/bin:$PATH"
+
+before_script:
+  - cabal --version
+  - cabal update
+  - ghc --version
+  - ghc-pkg list
+
 script:
-  - cabal configure --enable-tests --enable-library-coverage && cabal build && cabal test
+  - cabal configure --enable-tests --enable-library-coverage
+  - cabal build
+  - cabal test
+  - cabal install --enable-documentation
+  - cabal sdist
+
 after_script:
+  - ghc-pkg list
   - cabal install codecov-haskell
   - codecov-haskell --exclude-dir=test lexerTest 
