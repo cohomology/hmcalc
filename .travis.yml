@@ -31,5 +31,5 @@ script:
 
 after_script:
   - ghc-pkg list
-  - cabal install codecov-haskell
-  - dist/build/codecov-haskell/codecov-haskell --exclude-dir=test --display-report lexerTest
+  - cabal sandbox init && cabal install codecov-haskell
+  - .cabal-sandbox/bin/codecov-haskell --exclude-dir=test --display-report lexerTest 
