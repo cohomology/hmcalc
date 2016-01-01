@@ -1,13 +1,5 @@
 matrix:
   include:
-   - env: CABALVER=1.20 GHCVER=7.8.4
-     addons:
-       apt:
-         sources:
-          - hvr-ghc
-         packages:
-          - cabal-install-1.20
-          - ghc-7.8.4
    - env: CABALVER=1.22 GHCVER=7.10.3
      addons:
        apt:
@@ -28,16 +20,16 @@ before_script:
   - cabal update
   - ghc --version
   - ghc-pkg list
+  - cabal install codecov-haskell
 
 script:
   - cabal install --enable-tests --enable-documentation --enable-coverage --only-dependencies
   - cabal configure --enable-tests --enable-coverage
   - cabal build
-  - cabal test
-  - cabal install --enable-documentation
+  - run-cabal-test
+  - cabal install --enable-documentation 
   - cabal sdist
 
 after_script:
   - ghc-pkg list
-  - cabal install codecov-haskell
   - codecov-haskell --exclude-dir=test lexerTest 
