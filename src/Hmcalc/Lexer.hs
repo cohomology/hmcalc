@@ -1,3 +1,6 @@
+{-# LANGUAGE Haskell2010 #-} 
+{-# LANGUAGE Safe #-}
+
 module Hmcalc.Lexer(
     TokenType(..), 
     Token(..), 
