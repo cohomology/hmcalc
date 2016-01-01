@@ -32,7 +32,7 @@ before_script:
   - ghc-pkg list
 
 script:
-  - cabal install --only-dependencies
+  - cabal install --enable-tests --only-dependencies
   - cabal configure --enable-tests --enable-coverage
   - cabal build
   - cabal test
