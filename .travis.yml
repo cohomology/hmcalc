@@ -11,9 +11,12 @@ matrix:
    
 sudo: false
 
+before_install:
+  - cabal install hpc-coveralls
+
 # The packages from the PPA don't put this into the PATH automatically.
 install:
- - export PATH="/opt/cabal/$CABALVER/bin:/opt/ghc/$GHCVER/bin:$PATH"
+  - export PATH="/opt/cabal/$CABALVER/bin:/opt/ghc/$GHCVER/bin:$PATH"
 
 before_script:
   - cabal --version
@@ -22,10 +25,13 @@ before_script:
   - ghc-pkg list
 
 script:
-  - cabal install --enable-tests --enable-documentation --enable-coverage --only-dependencies
-  - cabal configure --enable-tests --enable-coverage && cabal build && cabal test
+  - cabal install --enable-tests --enable-benchmarks --enable-documentation --enable-coverage --only-dependencies
+  - cabal configure --enable-tests --enable-benchmarks --enable-coverage
+  - cabal build
+  - cabal test
+  - cabal install --enable-tests --enable-benchmarks --enable-documentation --enable-coverage 
+  - cabal sdist
 
 after_script:
   - ghc-pkg list
-  - cabal install codecov-haskell
-  - codecov-haskell --exclude-dir=test lexerTest 
+  - hpc-coveralls --exclude-dir=test --display-report lexerTest
