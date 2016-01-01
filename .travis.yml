@@ -20,16 +20,12 @@ before_script:
   - cabal update
   - ghc --version
   - ghc-pkg list
-  - cabal install codecov-haskell
 
 script:
   - cabal install --enable-tests --enable-documentation --enable-coverage --only-dependencies
-  - cabal configure --enable-tests --enable-coverage
-  - cabal build
-  - run-cabal-test
-  - cabal install --enable-documentation 
-  - cabal sdist
+  - cabal configure --enable-tests --enable-coverage && cabal build && cabal test
 
 after_script:
   - ghc-pkg list
+  - cabal install codecov-haskell
   - codecov-haskell --exclude-dir=test lexerTest 
