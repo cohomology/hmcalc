@@ -1,5 +1,13 @@
 matrix:
   include:
+   - env: CABALVER=1.20 GHCVER=7.8.4
+     addons:
+       apt:
+         sources:
+          - hvr-ghc
+         packages:
+          - cabal-install-1.20
+          - ghc-7.8.4
    - env: CABALVER=1.22 GHCVER=7.10.3
      addons:
        apt:
@@ -8,17 +16,7 @@ matrix:
          packages:
           - cabal-install-1.22
           - ghc-7.10.3
-   - env: CABALVER=head GHCVER=head
-     addons:
-       apt:
-         sources:
-          - hvr-ghc
-         packages:
-          - cabal-install-head
-          - ghc-head
-  allow_failures:
-   - env: CABALVER=head GHCVER=head
-
+   
 sudo: false
 
 # The packages from the PPA don't put this into the PATH automatically.
@@ -32,7 +30,7 @@ before_script:
   - ghc-pkg list
 
 script:
-  - cabal install --enable-tests --only-dependencies
+  - cabal install --enable-tests --enable-documentation --enable-coverage --only-dependencies
   - cabal configure --enable-tests --enable-coverage
   - cabal build
   - cabal test
