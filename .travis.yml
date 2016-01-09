@@ -32,5 +32,6 @@ script:
 
 after_script:
   - ghc-pkg list
+  - find ./ -name "*.tix"
   - cabal install codecov-haskell
   - .cabal-sandbox/bin/codecov-haskell --exclude-dir=test --display-report lexerTest 
