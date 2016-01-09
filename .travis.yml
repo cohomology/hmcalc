@@ -24,7 +24,7 @@ before_script:
 
 script:
   - cabal install --enable-tests --enable-benchmarks --enable-documentation --only-dependencies
-  - cabal configure --enable-tests --enable-benchmarks --enable-coverage
+  - cabal configure --enable-tests --enable-benchmarks --enable-library-coverage
   - cabal build
   - cabal test
   - cabal install --enable-tests --enable-benchmarks --enable-documentation 
