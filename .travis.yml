@@ -1,13 +1,13 @@
 matrix:
   include:
-   - env: CABALVER=1.22 GHCVER=7.10.3
+   - env: CABALVER=1.18 GHCVER=7.8.4
      addons:
        apt:
          sources:
           - hvr-ghc
          packages:
-          - cabal-install-1.22
-          - ghc-7.10.3
+          - cabal-install-1.18
+          - ghc-7.8.4
    
 sudo: false
 
@@ -32,6 +32,5 @@ script:
 
 after_script:
   - ghc-pkg list
-  - find ./ -name "*.tix"
   - cabal install codecov-haskell
   - .cabal-sandbox/bin/codecov-haskell --exclude-dir=test --display-report lexerTest 
