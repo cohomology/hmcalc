@@ -20,6 +20,7 @@ before_script:
   - cabal update
   - ghc --version
   - ghc-pkg list
+  - cabal sandbox init
 
 script:
   - cabal install --enable-tests --enable-benchmarks --enable-documentation --only-dependencies
@@ -31,5 +32,5 @@ script:
 
 after_script:
   - ghc-pkg list
-  - cabal sandbox init && cabal install codecov-haskell
+  - cabal install codecov-haskell
   - .cabal-sandbox/bin/codecov-haskell --exclude-dir=test --display-report lexerTest 
