@@ -19,14 +19,17 @@ before_script:
 
 script:
   - cabal install --enable-tests --enable-benchmarks --enable-documentation --only-dependencies
-  - cabal configure -v2 --enable-tests --enable-benchmarks --enable-library-coverage
+  - cabal configure -v2 --enable-tests --enable-benchmarks --enable-coverage
   - cabal build
   - cabal test
   - cabal install --enable-tests --enable-benchmarks --enable-documentation 
   - cabal sdist
-  - hlint src --cpp-define HLINT
+  - ghc-pkg list
+  - cabal install hlint
+  - .cabal-sandbox/bin/hlint src --cpp-define HLINT
 
 after_script:
-  - ghc-pkg list
   - cabal install hpc-coveralls
   - .cabal-sandbox/bin/hpc-coveralls --exclude-dir=test lexerTest 
+  - cabal install codecov-haskell
+  - .cabal-sandbox/bin/codecov-haskell --exclude-dir=test lexerTest
