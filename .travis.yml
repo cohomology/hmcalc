@@ -19,9 +19,9 @@ before_script:
   - cabal --version
   - cabal update
   - ghc --version
-  - travis_retry sudo apt-get -q -y install hlint
   - ghc-pkg list
   - cabal sandbox init
+  - cabal install hlint
 
 script:
   - cabal install --enable-tests --enable-benchmarks --enable-documentation --only-dependencies
@@ -30,7 +30,7 @@ script:
   - cabal test
   - cabal install --enable-tests --enable-benchmarks --enable-documentation 
   - cabal sdist
-  - hlint src --cpp-define HLINT
+  - .cabal-sandbox/bin/hlint src --cpp-define HLINT
 
 after_script:
   - ghc-pkg list
