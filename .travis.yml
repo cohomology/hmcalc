@@ -8,6 +8,7 @@ matrix:
          packages:
           - cabal-install-1.18
           - ghc-7.8.4
+          - hlint
    
 sudo: false
 
@@ -21,7 +22,6 @@ before_script:
   - ghc --version
   - ghc-pkg list
   - cabal sandbox init
-  - cabal install hlint
 
 script:
   - cabal install --enable-tests --enable-benchmarks --enable-documentation --only-dependencies
@@ -30,7 +30,7 @@ script:
   - cabal test
   - cabal install --enable-tests --enable-benchmarks --enable-documentation 
   - cabal sdist
-  - .cabal-sandbox/bin/hlint src --cpp-define HLINT
+  - hlint src --cpp-define HLINT
 
 after_script:
   - ghc-pkg list
